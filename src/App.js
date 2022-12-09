@@ -1,14 +1,15 @@
 
 import Boards from './components/Boards';
+import './style/root.scss'
 
 function App() {
   return (
-    <>
+    <div className='app'>
     <h1>
-    This is Tic Tac Toe
+     Tic Tac Toe
     <Boards/>
     </h1>
-    </>
+    </div>
   );
 }
 
