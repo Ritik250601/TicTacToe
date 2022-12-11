@@ -1,60 +1,55 @@
-
-import Boards from './components/Boards';
-import { useState } from 'react';
-import './style/root.scss'
+import React, { useState } from 'react';
+import Board from './components/Boards';
 import { calculateWinner } from './helpers';
+import History from './components/History';
 
-function App() {
+import './style/root.scss';
 
-  const [board, setBoard] = useState(Array(9).fill(null)); 
-  const [isNext, setIsNext] = useState(false);
-  
- const winner = calculateWinner(board);
-const message = winner ? `Winner is ${winner}` : `Next Player is ${isNext ? 'O' : 'X'}`;
+const App = () => {
+  const [history, setHistory] = useState([
+    { board: Array(9).fill(null), isXNext: true },
+  ]);
+  const [currentMove, setCurrentMove] = useState(0);
 
- console.log(winner)
+  const current = history[currentMove];
 
-  console.log(board)
-  
-  const handleSquareClick =  (position) => {
-  if(board[position] || winner){
-    return;
-  }
-  
-    setBoard( (prev) =>{
-      return prev.map((square, pos) => {
-        if(pos === position){
-          return isNext ? 'O' : 'X';
+  console.log('history', history);
+
+  const winner = calculateWinner(current.board);
+  const message = winner
+    ? `Winner is ${winner}`
+    : `Next player is ${current.isXNext ? 'X' : 'O'}`;
+
+  const handleSquareClick = position => {
+    if (current.board[position] || winner) {
+      return;
+    }
+
+    setHistory(prev => {
+      const last = prev[prev.length - 1];
+
+      const newBoard = last.board.map((square, pos) => {
+        if (pos === position) {
+          return last.isXNext ? 'X' : 'O';
         }
+
         return square;
       });
-       
+
+      return prev.concat({ board: newBoard, isXNext: !last.isXNext });
     });
-  
-    setIsNext((prev) => !prev)
-  
-  }
-  console.log(board)
 
-
-
-  const [first, setfirst] = useState(false)
-
-  const fun = () => {
-    console.log("first time", first)
-    setfirst(!first )
-    console.log(first)
-  }
+    setCurrentMove(prev => prev + 1);
+  };
 
   return (
-    <div className='app'>
-    <h1 onClick={fun}>
-     Tic Tac Toe
-    </h1>
-    <h3>{message}</h3>
-    <Boards handleSquareClick={handleSquareClick} board={board}/>
+    <div className="app">
+      <h1>TIC TAC TOE</h1>
+      <h2>{message}</h2>
+      <Board board={current.board} handleSquareClick={handleSquareClick} />
+    <History history={history}/>
     </div>
   );
-}
+};
 
 export default App;
